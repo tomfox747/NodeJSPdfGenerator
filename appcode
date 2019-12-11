@@ -1,0 +1,40 @@
+import React from 'react';
+import ReactDOM from 'react-dom'
+import './App.css';
+import axios from 'axios'
+import { saveAs } from 'file-saver'
+
+function App() {
+
+  let groupA = ['user1','user2','user3','user4','user5']
+  let groupB = ['user6','user7','user8','user9','user10']
+  let groups = [groupA, groupB]
+
+  const createPDF = () =>{
+    console.log("file is being created")
+    axios.get('/createpdf')
+    .then(res =>{
+      const pdfBlob = new Blob([res.data], {type:'groups/pdf'})
+      saveAs(pdfBlob, 'groups.pdf')
+    })
+  }
+
+  const getpdf = () =>{
+    console.log("file is being retrieved")
+    axios.get('/getpdf', {responseType:'blob'})
+    .then((res) => {
+      const pdfBlob = new Blob([res.data], {type:'groups/pdf'})
+      saveAs(pdfBlob, 'groups.pdf')
+    })
+  }
+
+  return (
+    <div className="App">
+      <p>Page is running</p>
+      <button onClick={() => createPDF()}>create PDF button</button>
+      <button onClick={() => getpdf()}>get PDF button</button>
+    </div>
+  );
+}
+
+export default App;
