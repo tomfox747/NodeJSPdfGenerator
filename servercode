@@ -1,0 +1,67 @@
+const express =  require('express')
+const bodyparser = require('body-parser')
+const pdf = require('pdfkit')
+const fs = require('fs')
+const cors = require('cors')
+
+const port = 8080
+const app = express()
+
+app.use(bodyparser.urlencoded({extended: true}))
+app.use(bodyparser.json())
+app.use(cors())
+
+let groupA = ['user1','user2','user3','user4','user5']
+let groupB = ['user6','user7','user8','user9','user10']
+let groups = [groupA, groupB]
+
+app.get('/createpdf', async (req,res) =>{
+    console.log("Download requested")
+
+    var doc = new pdf()
+    doc.pipe(fs.createWriteStream('./groups.pdf'))
+    doc.pipe(res)
+
+    let textString = ""
+
+    doc.text("Groups data pdf",100,100)
+
+    doc.moveDown(2)
+        .text("this is some text")
+
+    for(let x = 0; x < 5; x++){
+        doc = addToDoc(doc)
+    }
+    
+    /*
+    for(let x = 0; x < groups.length; x++){
+        let group = groups[x]
+        doc.text("Next group",100,100)
+        for(let y = 0; y < group.length; y++){
+            doc.moveDown()
+                .text(group[y],100,100)
+        }
+        doc.moveDown()
+    }*/
+
+    doc.end()
+
+    res.download('./groups.pdf','./groups.pdf')
+    //res.sendFile(`${__dirname}/groups.pdf`)
+})
+
+function addToDoc(docInput){
+    docInput.moveDown()
+        .text("Some text from the function")
+
+    return docInput
+}
+
+app.get('getpdf', (req,res) =>{
+    console.log("getpdf has been called")
+    res.sendFile(`${__dirname}/groups.pdf`)
+})
+
+app.listen(port, () =>{
+    console.log("server is listening")
+})
